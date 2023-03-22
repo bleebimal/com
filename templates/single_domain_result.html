@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Result</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css"
+    />
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', { packages: ['corechart'] });
+    </script>
+    <style>
+      body {
+        height: 50em;
+        background: #f1f1f1;
+      }
+
+      .navbar-fixed {
+        height: auto !important;
+      }
+
+      nav {
+        height: auto;
+      }
+
+      .mb-0 {
+        margin-bottom: 0;
+      }
+
+      .pt-10 {
+        padding-top: 10em;
+      }
+
+      .tabs .indicator {
+        background-color: #fff;
+      }
+
+      .header {
+        margin: 1em 0;
+        font-weight: 600;
+        color: #333;
+        text-transform: uppercase;
+      }
+
+      .mx {
+        max-width: 92%;
+        margin: 0 auto;
+      }
+
+      thead {
+        font-size: 28px;
+        color: yellow;
+        text-transform: uppercase;
+      }
+
+      #final_assignee th {
+        min-width: 8.35em;
+      }
+
+      #by_centrality th:first-child {
+        min-width: 11.8em;
+      }
+      svg > g:first-of-type > text {
+        transform: translateX(calc(33% - 150px));
+      }
+      #by_year th:nth-child(2) {
+        max-width: 5em;
+      }
+      #final_inventor th:nth-child(2) {
+        max-width: 5.9em;
+      }
+
+      th {
+        font-size: 18px;
+      }
+
+      #by_year {
+        width: 65%;
+        float: right;
+      }
+
+      #by_year > thead > tr > th {
+        width: 50%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar-fixed" style="background-color: #0056b3">
+      <nav>
+        <div class="nav-wrapper blue">
+          <div class="row mb-0">
+            <div class="col s2" style="margin-left: 20px">
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='/main';"
+                style="background-color: #00796b"
+              >
+                Home
+              </h3>
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='/main';"
+                style="background-color: #00796b"
+              >
+                Button
+              </h3>
+            </div>
+            <div class="col s8 text-center">
+              <h3>Result</h3>
+            </div>
+            <div class="col s1 text-center">
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='https://google.com';"
+                style="background-color: #00796b"
+              >
+                GOOGLE
+              </h3>
+            </div>
+            <div class="col s1 text-right">
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='/logout';"
+                style="background-color: #00796b"
+              >
+                Logout
+              </h3>
+            </div>
+          </div>
+          <div class="row mb-0">
+            <div class="col s12" style="font-weight: bold">
+              <ul class="tabs blue">
+                <li class="tab col s1">
+                  <a href="#by_year" class="active white-text">By Year</a>
+                </li>
+                <li class="tab col s1">
+                  <a href="#byCentrality" class="white-text">By Centrality</a>
+                </li>
+                <li class="tab col s1">
+                  <a href="#final_assignee" class="white-text"
+                    >Final Assignee</a
+                  >
+                </li>
+                <li class="tab col s1">
+                  <a href="#final_inventor" class="white-text"
+                    >Final Inventor</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="container-fluid pt-10 mx">
+      <div class="row">
+        <div id="by_year" class="col s12">
+          <h3 class="header">By Year</h3>
+
+          <div class="row">
+            <div class="col s10 float-left">{{ by_year_chart.as_html }}</div>
+            <div class="col s2">
+              {% autoescape off %}{{ by_year_table }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+
+        <div id="byCentrality" class="col s12">
+          <h3 class="header">By Centrality</h3>
+
+          <div class="row">
+            <div class="col s12">
+              {% autoescape off %}{{ by_centrality_table }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+
+        <div id="final_assignee" class="col s12">
+          <h3 class="header">Final Assignee</h3>
+
+          <div class="row">
+            <div class="col s8" id="final_assignee_chart">
+              {{ final_assignee_chart.as_html }}
+            </div>
+            <div class="col s4">
+              {% autoescape off %}{{ final_assignee_table }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+
+        <div id="final_inventor" class="col s12">
+          <h3 class="header">Final Inventor</h3>
+
+          <div class="row">
+            <div class="col s8" id="final_inventor_chart">
+              {{ final_inventor_chart.as_html }}
+            </div>
+            <div class="col s4">
+              {% autoescape off %}{{ final_inventor_table }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // console.log('{{final_assignee_list}}'.replace(/&#x27;/g, '"'));
+      $('[href="#final_assignee"]').on('click', function () {
+        setTimeout(function () {
+          $('#final_assignee_chart').html($('#final_assignee_chart').html());
+          setTimeout(function () {
+            $('text:contains(ASSIGNEE):last').attr('y', 520);
+            $('#final_assignee_chart').find('svg').attr('height', 550);
+            $('#final_assignee_chart').find('svg>rect').attr('height', 550);
+          }, 1);
+        }, 1);
+      });
+      $('[href="#final_inventor"]').on('click', function () {
+        setTimeout(function () {
+          $('#final_inventor_chart').html($('#final_inventor_chart').html());
+          setTimeout(function () {
+            $('text:contains(INVENTORS):last').attr('y', 520);
+            $('#final_inventor_chart').find('svg').attr('height', 550);
+            $('#final_inventor_chart').find('svg>rect').attr('height', 550);
+          }, 1);
+        }, 1);
+      });
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+</html>

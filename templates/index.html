@@ -1,0 +1,60 @@
+<html>
+
+<head>
+    <title>Index</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet"
+          id="bootstrap-css">
+    <style>
+        .container {
+            margin-top: 100px;
+            height: 400px;
+            width: 500px;
+        }
+
+        button {
+            font-size: 24px;
+            margin: 15px
+        }
+
+        .jumbotron {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/logout" class="btn btn-success text-white btn-lg" style="margin:10px 80%;background-color: #00796b">Logout</a>
+    <form class="jumbotron">
+        <h2>Welcome</h2>
+        <div class="form-group">
+            <div class="btn-group-vertical" role="group" aria-label="Button group with nested dropdown">
+                <button type="button" class="btn btn-success btn-lg" onclick="navigateTo('patent')">Patent Quality</button>
+                <button type="button" class="btn btn-success btn-lg" onclick="navigateTo('singleDomain')">Single Domain</button>
+                <button type="button" class="btn btn-success btn-lg" onclick="navigateTo('multipleDomain')">Multiple Domain</button>
+                <button type="button" class="btn btn-success btn-lg" onclick="navigateTo('relevance')">Relevance</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+
+<script>
+    function navigateTo(place) {
+        switch (place) {
+            case "patent":
+                location.href = "/patent"
+                break
+            case "singleDomain":
+                location.href = "/singleDomain"
+                break
+            case "multipleDomain":
+                location.href = "/multipleDomain"
+                break
+            case "relevance":
+                location.href = "/relevance"
+                break
+        }
+    }
+</script>
+
+</html>

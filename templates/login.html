@@ -1,0 +1,78 @@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"/>
+    <style>
+        .container {
+            border: 2px solid blue;
+            text-align: center;
+            height: 400px;
+            width: 550px;
+
+        }
+
+        body {
+            padding: 14%;
+            background-color: aliceblue;
+        }
+
+        h1 {
+            margin: auto;
+        }
+
+        .row {
+            height: 90px;
+            width: 546px;
+            background-color: #007bff;
+        }
+        input{
+            height : 58px;
+        }
+    </style>
+</head>
+<div class="text-center text-danger" style="font-weight: bold;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <meta http-equiv="REFRESH" content="0;url=/main/">
+    {% endif %}
+</div>
+
+<div class="container">
+    <div class="row">
+        <h1><i class="fa fa-lock" aria-hidden="true"></i> Login</h1>
+
+    </div>
+    <br/>
+
+    <form method="post" action="/login/" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+            </div>
+            <input type="text" name="username" class="form-control input-lg" placeholder="Enter Username"/>
+        </div>
+        <br/>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-key"></i></span>
+            </div>
+            <input type="password" name="password" class="form-control input-lg" placeholder="Enter Password"/>
+
+        </div>
+        <br/>
+        <button type="submit" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-off"></span> Login</button>
+    </form>
+
+</div>
+
+
+

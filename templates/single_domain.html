@@ -1,0 +1,128 @@
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet"
+      id="bootstrap-css">
+
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    function refreshPage() {
+        window.location.reload();
+    }
+</script>
+
+<head>
+    <title>Analyze</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"/>
+    <style>
+        .container {
+            border: 2px solid blue;
+            text-align: center;
+            height: 400px;
+            width: 550px;
+        }
+
+        body {
+            padding: 8% 14%;
+            background-color: aliceblue;
+        }
+
+        h1 {
+            margin: auto;
+        }
+
+        .banner {
+            height: 90px;
+            width: 546px;
+            background-color: #0056b3;
+        }
+
+        input[type="file"] {
+            height: 50px;
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            height: 50px;
+        }
+
+    </style>
+</head>
+<div class="text-center text-danger" style="font-weight: bold;">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-2">
+            <a href="/main" class="btn btn-success float-left text-white btn-lg"
+               style="margin:10px;background-color: #00796b">Home</a>
+        </div>
+        <div class="col-md-8">
+            <h2 style="margin: 10px;">Single Domain</h2>
+        </div>
+        <div class="col-md-2">
+            <a href="/logout" class="btn btn-success float-right text-white btn-lg"
+               style="margin:10px;background-color: #00796b">Logout</a>
+        </div>
+    </div>
+    <div class="banner row">
+        <h1><i class="fa fa-file-csv" aria-hidden="true"></i> CSV File Upload</h1>
+
+    </div>
+    <br/><br/>
+
+    <form method="post" action="/single_domain_analyze/" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-file"></i></span>
+            </div>
+            <input type="file" id="file" name="file" class="form-control" size="100" required
+                   oninvalid="this.setCustomValidity('Please Upload a CSV')"
+                   oninput="this.setCustomValidity('')"/>
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <div class="row"
+             style="height: auto !important; width: auto !important; background: none !important; margin: 0 auto;">
+            <div class="col-md-6">
+                <button class="btn btn-success btn-lg" onclick="enable();" type="submit"
+                        style="background-color: #00796b">
+                    <span id="spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Analyze
+                </button>
+
+            </div>
+            <div class="col-md-6">
+                <button id="stop" class="btn btn-danger btn-lg"
+                        onClick="refreshPage()"
+                        style="float: left;background-color: #00796b">
+                    <span class="glyphicon glyphicon-off"></span> Stop
+                </button>
+
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#stop').attr('disabled', true);
+        $('#spinner').hide();
+    });
+
+    function enable() {
+        if (document.getElementById("file").files.length === 0) {
+            console.log("no files selected");
+        } else {
+            $('#stop').attr('disabled', false);
+            $('#spinner').show();
+        }
+    }
+</script>

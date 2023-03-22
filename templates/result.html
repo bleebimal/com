@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Result</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css"
+    />
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', { packages: ['corechart'] });
+    </script>
+    <script src="https://unpkg.com/popper.js@1"></script>
+    <script src="https://unpkg.com/tippy.js@5"></script>
+    <script>
+      hover();
+      function hover() {
+        $(document).ready(() => {
+          const td = $(
+            '#ipc tr td:first-child,#upc tr td:first-child,#cpc tr td:first-child,#result tr td:nth-child(2)'
+          );
+
+          td.mouseover(function (e) {
+            let ref = e.currentTarget;
+            let value = $(ref).text();
+            value = value ? value : $(ref).next().text();
+            let id = $(ref).closest('table').attr('id');
+
+            tippy(ref, {
+              content: 'Loading....',
+              flipOnUpdate: true,
+              placement: 'left',
+              onShow(instance) {
+                $.ajax({
+                  url: '/ajax/getData/',
+                  data: {
+                    table: id,
+                    value: value,
+                  },
+                  dataType: 'json',
+                  success: function (data) {
+                    if (data.status === '404') {
+                      instance.setContent('No Data Found');
+                    } else {
+                      instance.setContent(data.message);
+                    }
+                  },
+                  error: function () {
+                    instance.setContent('No Data Found');
+                  },
+                });
+              },
+            });
+          });
+        });
+      }
+
+      $('.tab').click(function () {
+        hover();
+      });
+    </script>
+    <style>
+      body {
+        height: 50em;
+        background: #f1f1f1;
+      }
+
+      .navbar-fixed {
+        height: auto !important;
+      }
+
+      nav {
+        height: auto;
+      }
+
+      .mb-0 {
+        margin-bottom: 0;
+      }
+
+      .pt-10 {
+        padding-top: 10em;
+      }
+
+      .tabs .indicator {
+        background-color: #fff;
+      }
+
+      .header {
+        margin: 1em 0;
+        font-weight: 600;
+        color: #333;
+        text-transform: uppercase;
+      }
+
+      .mx {
+        max-width: 92%;
+        margin: 0 auto;
+      }
+
+      thead {
+        font-size: 28px;
+        color: yellow;
+        text-transform: uppercase;
+      }
+
+      [type='checkbox'] {
+        position: unset !important;
+        opacity: 1 !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar-fixed" style="background-color: #0056b3">
+      <nav>
+        <div class="nav-wrapper blue">
+          <div class="row mb-0">
+            <div class="col s2" style="margin-left: 20px">
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='/main';"
+                style="background-color: #00796b"
+              >
+                Home
+              </h3>
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='/main';"
+                style="background-color: #00796b"
+              >
+                Button
+              </h3>
+            </div>
+            <div class="col s8 text-center">
+              <h3>Result</h3>
+            </div>
+            <div class="col s1 text-center">
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='https://google.com';"
+                style="background-color: #00796b"
+              >
+                GOOGLE
+              </h3>
+            </div>
+            <div class="col s1 text-right">
+              <h3
+                class="btn btn-primary"
+                onclick="window.location.href='/logout';"
+                style="background-color: #00796b"
+              >
+                Logout
+              </h3>
+            </div>
+          </div>
+          <div class="row mb-0">
+            <div class="col s12" style="font-weight: bold">
+              <ul class="tabs blue">
+                <li class="tab col s1">
+                  <a href="#ipc" class="active white-text">IPC</a>
+                </li>
+                <li class="tab col s1">
+                  <a class="white-text" href="#upc">UPC</a>
+                </li>
+                <li class="tab col s1">
+                  <a href="#cpc" class="white-text">CPC</a>
+                </li>
+                <li class="tab col s1">
+                  <a href="#combination" class="white-text">Combination</a>
+                </li>
+                <li class="tab col s1">
+                  <a href="#result" class="white-text">MPR</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="container-fluid pt-10 mx">
+      <div class="row">
+        <div id="ipc" class="col s12">
+          <h3 class="header">IPC MPR</h3>
+
+          <div class="row">
+            <div class="col s8">{{ ipc_chart_m.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ ipc_table_m }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+
+          <h3 class="header">IPC Recall</h3>
+
+          <div class="row">
+            <div class="col s8">{{ ipc_chart_r.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ ipc_table_r }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+          <h3 class="header">IPC PRECISION</h3>
+
+          <div class="row">
+            <div class="col s8">{{ ipc_chart_p.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ ipc_table_p }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+
+        <div id="upc" class="col s12">
+          <h3 class="header">UPC MPR</h3>
+
+          <div class="row">
+            <div class="col s8" id="upc_chart">{{ upc_chart_m.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ upc_table_m }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+
+          <h3 class="header">UPC Recall</h3>
+
+          <div class="row">
+            <div class="col s8">{{ upc_chart_r.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ upc_table_r }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+          <h3 class="header">UPC PRECISION</h3>
+
+          <div class="row">
+            <div class="col s8">{{ upc_chart_p.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ upc_table_p }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+
+        <div id="cpc" class="col s12">
+          <h3 class="header">CPC MPR</h3>
+
+          <div class="row">
+            <div class="col s8" id="cpc_chart">{{ cpc_chart_m.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ cpc_table_m }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+
+          <h3 class="header">CPC Recall</h3>
+
+          <div class="row">
+            <div class="col s8">{{ cpc_chart_r.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ cpc_table_r }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+          <h3 class="header">CPC PRECISION</h3>
+
+          <div class="row">
+            <div class="col s8">{{ cpc_chart_p.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ cpc_table_p }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+        <div id="combination" class="col s12">
+          <h3 class="header">Combination</h3>
+
+          <div class="row">
+            <div
+              class="col s6"
+              style="max-width: 65%; margin: 0 auto !important"
+            >
+              {% autoescape off %}{{ combination }}{% endautoescape %}
+            </div>
+          </div>
+        </div>
+        <div id="result" class="col s12">
+          <h3 class="header">IPC MPR</h3>
+
+          <div class="row">
+            <div class="col s8" id="ipc_mpr_chart">
+              {{ ipc_mpr_chart.as_html }}
+            </div>
+            <div class="col s4">
+              {% autoescape off %}{{ ipc_table_m }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+          <h3 class="header">UPC MPR</h3>
+
+          <div class="row">
+            <div class="col s8">{{ upc_mpr_chart.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ upc_table_m }}{% endautoescape %}
+            </div>
+          </div>
+
+          <hr />
+          <h3 class="header">CPC MPR</h3>
+
+          <div class="row">
+            <div class="col s8">{{ cpc_mpr_chart.as_html }}</div>
+            <div class="col s4">
+              {% autoescape off %}{{ cpc_table_m }}{% endautoescape %}
+            </div>
+          </div>
+
+          <div class="row float-right">
+            <button
+              id="generateResult"
+              class="btn btn-primary btn-large"
+              style="font-size: 30px; margin-right: 12px"
+            >
+              Display Combinations
+            </button>
+          </div>
+          <div class="clearfix"></div>
+
+          <div id="resultBox0" style="display: none"></div>
+
+          <div class="clearfix"></div>
+
+          <div id="resultBox" style="display: none"></div>
+        </div>
+      </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script>
+      $('[href="#upc"]').on('click', function () {
+        setTimeout(function () {
+          $('#upc').html($('#upc').html());
+          hover();
+        }, 1);
+      });
+
+      $('[href="#cpc"]').on('click', function () {
+        setTimeout(function () {
+          $('#cpc').html($('#cpc').html());
+          hover();
+        }, 1);
+      });
+      $('[href="#result"]').on('click', function () {
+        setTimeout(function () {
+          $('#result').html($('#result').html());
+          hover();
+        }, 1);
+      });
+
+      $(document).ready(function () {
+        let i =
+          "<input class='checkbox' type='checkbox' style='margin-left: 3rem;'/>";
+
+        $('#result tbody tr').each(function () {
+          $(this).prepend('<td>' + i + '</td>');
+        });
+
+        $('#result thead tr,#example tfoot tr').each(function (i) {
+          $(this).prepend("<th style='width: 10% !important;'>Select</th>");
+        });
+      });
+
+      $(document).on('click', '#generateResult', function () {
+        let ipc = $('#ipc_def_final input:checked');
+        let upc = $('#upc_def_final input:checked');
+        let cpc = $('#cpc_def_final input:checked');
+        $('html,body').animate({ scrollTop: 9999 }, 'slow');
+        firstCase(ipc, upc, cpc);
+        secondCase(ipc, upc, cpc);
+        thirdCase(ipc, upc, cpc);
+      });
+
+      $(document).on('click', '.checkbox', function () {
+        let ipc = $('#ipc_def_final input:checked');
+        let upc = $('#upc_def_final input:checked');
+        let cpc = $('#cpc_def_final input:checked');
+
+        if (hasData(ipc) && hasData(upc) && hasData(cpc)) {
+          $(this).prop('checked', false);
+          alert('Please select values from only 2 tables.');
+        }
+      });
+
+      function checkFirst(ipc, upc, cpc) {
+        let isFirst = true;
+        let data;
+        if (ipc.length > 0 && upc.length === 0 && cpc.length === 0) {
+          data = ['IPC', ipc];
+        } else if (ipc.length === 0 && upc.length > 0 && cpc.length === 0) {
+          data = ['UPC', upc];
+        } else if (ipc.length === 0 && upc.length === 0 && cpc.length > 0) {
+          data = ['CPC', cpc];
+        } else {
+          isFirst = false;
+        }
+
+        return [isFirst, data];
+      }
+
+      function firstCase(ipc, upc, cpc) {
+        let firstCaseReturn = checkFirst(ipc, upc, cpc);
+        let isFirst = firstCaseReturn[0];
+        let data = firstCaseReturn[1];
+
+        if (isFirst) {
+          let tempArray = nextColumnData(data[1]);
+          resetTable('resultBox');
+          $('#resultBox').show();
+          $('#resultBox0').hide();
+          $('#resultTable tbody').append(
+            `<tr><td>1</td><td>${data[0]}: (${tempArray.join(
+              ' OR '
+            )})</td></tr>`
+          );
+        }
+      }
+
+      function secondCase(ipc, upc, cpc) {
+        let check = checkFirst(ipc, upc, cpc);
+        let isSecond = check[0] === false;
+        if (isSecond) {
+          let ipcData = nextColumnData(ipc).map(
+            (ipcData) => `IPC:(${ipcData})`
+          );
+          let upcData = nextColumnData(upc).map(
+            (upcData) => `UPC:(${upcData})`
+          );
+          let cpcData = nextColumnData(cpc).map(
+            (cpcData) => `CPC:(${cpcData})`
+          );
+
+          let dataToDisplay;
+
+          if (hasData(ipcData) && hasData(upcData) && hasData(cpcData)) {
+            dataToDisplay = cartesianProduct(ipcData, upcData, cpcData);
+          } else if (hasData(ipcData) && hasData(upcData)) {
+            dataToDisplay = cartesianProduct(ipcData, upcData);
+          } else if (hasData(ipcData) && hasData(cpcData)) {
+            dataToDisplay = cartesianProduct(ipcData, cpcData);
+          } else if (hasData(upcData) && hasData(cpcData)) {
+            dataToDisplay = cartesianProduct(upcData, cpcData);
+          }
+
+          resetTable('resultBox');
+          dataToDisplay.forEach(function (i, j) {
+            $('#resultTable tbody').append(
+              `<tr><td>${j + 1}</td><td>${i.join(' AND ')}</td></tr>`
+            );
+          });
+          $('#resultBox').show();
+        }
+      }
+
+      function thirdCase(ipc, upc, cpc) {
+        let check = checkFirst(ipc, upc, cpc);
+        let isThird = check[0] === false;
+        if (isThird) {
+          let ipcData = nextColumnData(ipc);
+          let upcData = nextColumnData(upc);
+          let cpcData = nextColumnData(cpc);
+          let dataToDisplay;
+
+          if (hasData(ipcData) && hasData(upcData)) {
+            dataToDisplay = `IPC:(${ipcData.join(
+              ' OR '
+            )}) AND UPC:(${upcData.join(' OR ')})`;
+          } else if (hasData(ipcData) && hasData(cpcData)) {
+            dataToDisplay = `IPC:(${ipcData.join(
+              ' OR '
+            )}) AND CPC:(${cpcData.join(' OR ')})`;
+          } else if (hasData(upcData) && hasData(cpcData)) {
+            dataToDisplay = `UPC:(${upcData.join(
+              ' OR '
+            )}) AND CPC:(${cpcData.join(' OR ')})`;
+          }
+          resetTable('resultBox0');
+          $('#resultTable0 tbody').append(
+            `<tr><td>1</td><td>${dataToDisplay}</td></tr>`
+          );
+          $('#resultBox0').show();
+        }
+      }
+
+      function resetTable(id) {
+        $(`#${id}`).html(`<div class="row" style="margin-top:16px">
+                    <div class="col s12" style="text-align: -webkit-center;">
+                        <table class="table table-bordered table-striped table-hover table-dark w-50"
+                               id="${
+                                 id === 'resultBox'
+                                   ? 'resultTable'
+                                   : 'resultTable0'
+                               }">
+                            <thead>
+                            <tr style="text-align: right;">
+                            <th style="width: 4%">SN</th>
+                                <th>Combination</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`);
+      }
+
+      function cartesianProduct(...arrays) {
+        function _inner(...args) {
+          if (arguments.length > 1) {
+            let arr2 = args.pop();
+            let arr1 = args.pop();
+            return _inner(
+              ...args,
+              arr1
+                .map((e1) => arr2.map((e2) => [e1, ...e2]))
+                .reduce((arr, e) => arr.concat(e), [])
+            );
+          } else {
+            return args[0];
+          }
+        }
+
+        return _inner(...arrays, [[]]);
+      }
+
+      function nextColumnData(column) {
+        let tempArray = [];
+        column.each(function (i, j) {
+          tempArray[i] = $(j).parent().next().text();
+        });
+        return tempArray;
+      }
+
+      function hasData(array) {
+        return array.length > 0;
+      }
+    </script>
+  </body>
+</html>
